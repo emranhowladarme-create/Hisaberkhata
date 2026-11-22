@@ -1,0 +1,6 @@
+{
+  "name": "Hishaber Khata",
+  "description": "ব্যবসায়িক হিসাব, কাস্টমার বাকী-বকেয়া, ক্যাশবুক, স্টক ও রিপোর্ট ব্যবস্থাপনার পূর্ণাঙ্গ অ্যান্ড্রয়েড অ্যাপ (Hishaber Khata)",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

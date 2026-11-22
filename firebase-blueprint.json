@@ -1,0 +1,238 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Business owner profile, active business pointer, SMS balance, and app preferences.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "description": "Owner Firebase Auth UID" },
+        "ownerName": { "type": "string", "description": "Owner display name" },
+        "businessName": { "type": "string", "description": "Primary business display name" },
+        "phone": { "type": "string", "description": "Bangladesh mobile number (+880...)" },
+        "address": { "type": "string", "description": "Business street address" },
+        "businessCategory": { "type": "string", "description": "Business category" },
+        "activeBusinessId": { "type": "string", "description": "Currently selected business document ID" },
+        "smsBalance": { "type": "integer", "description": "Remaining SMS credit count" },
+        "language": { "type": "string", "enum": ["bn", "en"], "description": "Preferred UI language" },
+        "notificationsEnabled": { "type": "boolean" },
+        "lowStockAlertEnabled": { "type": "boolean" },
+        "autoReminderEnabled": { "type": "boolean" },
+        "pinLockEnabled": { "type": "boolean" },
+        "pinHash": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Server timestamp" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Server timestamp" }
+      },
+      "required": ["userId", "ownerName", "businessName", "activeBusinessId", "smsBalance", "language", "createdAt", "updatedAt"]
+    },
+    "Business": {
+      "title": "Business",
+      "description": "Individual business profile for multi-business switching.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "category": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "name", "createdAt", "updatedAt"]
+    },
+    "Customer": {
+      "title": "Customer",
+      "description": "Customer account with running receivable/payable balance.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "name": { "type": "string" },
+        "phone": { "type": "string" },
+        "address": { "type": "string" },
+        "balance": { "type": "number", "description": "Positive = Paona (receivable), Negative = Dena (payable)" },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "name", "balance", "createdAt", "updatedAt"]
+    },
+    "LedgerTransaction": {
+      "title": "LedgerTransaction",
+      "description": "Customer credit/debit or cashbook income/expense transaction.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "entryScope": { "type": "string", "enum": ["customer", "cashbook"] },
+        "type": { "type": "string", "enum": ["gave", "received", "income", "expense"] },
+        "amount": { "type": "number" },
+        "description": { "type": "string" },
+        "dateMillis": { "type": "integer" },
+        "attachmentUri": { "type": "string" },
+        "paymentMethod": { "type": "string", "enum": ["cash", "bkash", "nagad", "rocket", "bank", "qr"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "entryScope", "type", "amount", "dateMillis", "paymentMethod", "createdAt", "updatedAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Inventory product with purchase price, selling price, and stock level.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "name": { "type": "string" },
+        "unit": { "type": "string" },
+        "purchasePrice": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "quantity": { "type": "integer" },
+        "lowStockThreshold": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "name", "unit", "purchasePrice", "sellingPrice", "quantity", "lowStockThreshold", "createdAt", "updatedAt"]
+    },
+    "InventoryLog": {
+      "title": "InventoryLog",
+      "description": "Append-only stock update audit record.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "productId": { "type": "string" },
+        "productName": { "type": "string" },
+        "changeQty": { "type": "integer" },
+        "resultingQty": { "type": "integer" },
+        "reason": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "productId", "productName", "changeQty", "resultingQty", "reason", "createdAt"]
+    },
+    "SmsLog": {
+      "title": "SmsLog",
+      "description": "Customer SMS reminder history and scheduled messages.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "customerId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "phone": { "type": "string" },
+        "message": { "type": "string" },
+        "messageType": { "type": "string", "enum": ["tagada", "order", "custom", "group"] },
+        "status": { "type": "string", "enum": ["sent", "scheduled"] },
+        "scheduledAtMillis": { "type": "integer" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "customerName", "phone", "message", "messageType", "status", "createdAt"]
+    },
+    "BusinessNote": {
+      "title": "BusinessNote",
+      "description": "Business quick note.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "pinned": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "title", "pinned", "createdAt", "updatedAt"]
+    },
+    "AppNotification": {
+      "title": "AppNotification",
+      "description": "In-app inbox alert and update notification.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "body": { "type": "string" },
+        "category": { "type": "string", "enum": ["payment", "promo", "qr", "feature", "stock", "update"] },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "title", "body", "category", "isRead", "createdAt"]
+    },
+    "SupportTicket": {
+      "title": "SupportTicket",
+      "description": "Customer help center support ticket.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "subject": { "type": "string" },
+        "description": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "answered", "closed"] },
+        "reply": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "subject", "description", "status", "createdAt", "updatedAt"]
+    },
+    "QrPaymentRecord": {
+      "title": "QrPaymentRecord",
+      "description": "Generated or scanned QR payment history record.",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "businessId": { "type": "string" },
+        "customerName": { "type": "string" },
+        "amount": { "type": "number" },
+        "qrPayload": { "type": "string" },
+        "direction": { "type": "string", "enum": ["generated", "scanned"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "businessId", "customerName", "amount", "qrPayload", "direction", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User account and settings"
+    },
+    "/users/{userId}/businesses/{businessId}": {
+      "schema": { "$ref": "#/entities/Business" },
+      "description": "User businesses"
+    },
+    "/users/{userId}/customers/{customerId}": {
+      "schema": { "$ref": "#/entities/Customer" },
+      "description": "Business customers"
+    },
+    "/users/{userId}/transactions/{transactionId}": {
+      "schema": { "$ref": "#/entities/LedgerTransaction" },
+      "description": "Customer and cashbook transactions"
+    },
+    "/users/{userId}/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Inventory products"
+    },
+    "/users/{userId}/inventoryLogs/{logId}": {
+      "schema": { "$ref": "#/entities/InventoryLog" },
+      "description": "Inventory stock movement logs"
+    },
+    "/users/{userId}/smsLogs/{smsId}": {
+      "schema": { "$ref": "#/entities/SmsLog" },
+      "description": "SMS history and scheduled reminders"
+    },
+    "/users/{userId}/notes/{noteId}": {
+      "schema": { "$ref": "#/entities/BusinessNote" },
+      "description": "Business notes"
+    },
+    "/users/{userId}/notifications/{notifId}": {
+      "schema": { "$ref": "#/entities/AppNotification" },
+      "description": "Inbox notifications"
+    },
+    "/users/{userId}/supportTickets/{ticketId}": {
+      "schema": { "$ref": "#/entities/SupportTicket" },
+      "description": "Help center tickets"
+    },
+    "/users/{userId}/qrTransactions/{qrTxId}": {
+      "schema": { "$ref": "#/entities/QrPaymentRecord" },
+      "description": "QR payment history"
+    }
+  }
+}
